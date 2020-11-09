@@ -15,7 +15,7 @@ export default function Sign() {
 
             <div className="input-group mb-3">
 
-                <input type="text" className="form-control" placeholder="User name" aria-label="Recipient's username" aria-describedby="basic-addon2"/>
+                <input type="text" className="form-control" placeholder="User name"/>
 
                 <div className="input-group-append">
 
