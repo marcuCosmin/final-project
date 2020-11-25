@@ -6,7 +6,9 @@ const authContext = React.createContext({
     isSignedIn: false,
     user: null,
     displayName: '',
-    emailVerified: false
+    emailVerified: false,
+    uid: '',
+    photoURL: null
 });
 
 function ACProvider({children}) {
@@ -16,22 +18,23 @@ function ACProvider({children}) {
         user: null,
         displayName: '',
         emailVerified: false,
-        uid: ''
+        uid: '',
+        photoURL: null
     });
 
     useEffect(function() {
 
-        firebase.auth().onAuthStateChanged(function(user) {
+        firebase.auth().onAuthStateChanged(function (user) {
 
             if (user) {
               
-                console.log({user});
                 setAcValues({
                     isSignedIn: true,
                     user,
                     displayName: user.displayName,
                     emailVerified: user.emailVerified,
-                    uid: user.uid
+                    uid: user.uid,
+                    photoURL: user.photoURL
                 });
 
             } else {
@@ -41,17 +44,17 @@ function ACProvider({children}) {
                     user: null,
                     displayName: '',
                     emailVerified: false,
-                    uid: ''
+                    uid: '',
+                    photoURL: null
                 });
 
             }
-          });
+        });
 
     }, []);
 
     return (
 
-        
         <authContext.Provider value={acValues}>
             {children}
         </authContext.Provider>

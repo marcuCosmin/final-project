@@ -1,9 +1,13 @@
-import React from 'react';
-import Nav from './Nav';
+import React, {useContext} from 'react';
+import Header from './Header';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Sign from './Sign';
 import 'bootstrap/dist/css/bootstrap.css';
 import firebase from 'firebase/app';
+import Welcome from './Welcome';
+import { authContext } from './global/AuthenticationContext';
+import Settings from './Settings';
+import Profile from './Profile';
+import 'firebase/auth';
 
 firebase.initializeApp({
 
@@ -19,20 +23,28 @@ firebase.initializeApp({
 
 function App() {
 
+  const {isSignedIn, displayName, uid} = useContext(authContext);
+
   return (
-    <div>
-      
-      <Router>
 
-        <Nav/>
+      <div>
+        
+        <Router>
 
-        <Route exact path="/" component={() => <h1>Title</h1>}/>
-        <Route exact path="/sign-in" component={Sign}/>
+          <Header/>
 
-      </Router>
+          <Route exact path="/" component={isSignedIn ? () => <h1>Abc</h1> : Welcome }/>
 
-    </div>
+          <Route exact path="/settings" component={Settings}/>
+
+          <Route exact path={`/${displayName}_${uid}`} component={Profile}/>
+
+        </Router>
+
+      </div>
+
   );
+
 }
 
 export default App;
