@@ -1,0 +1,284 @@
+.modal_bg {
+
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.btn_link {
+
+    color: #007bff;
+    cursor: pointer;
+}
+
+.btn_link:hover {
+
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.w_30 {
+
+    width: 30%;
+}
+
+.border_primary {
+
+    border: 1px solid #007bff;
+}
+
+@media (min-width: 417px) {
+
+    .float_right_sm {
+      float: right;
+    }
+
+}
+
+.opacity_1 {
+
+    opacity: 1 !important;
+}
+
+.btn_primary_hover:hover {
+
+    color: #0069d9 !important;
+}
+
+.rounded_0_top {
+
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+
+}
+
+.rounded_0_bottom {
+
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+
+}
+
+.dropdown_title {
+
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dropdown_title_hover {
+
+    color: white !important;
+    text-decoration: underline !important;
+}
+
+.img_40x40 {
+
+    width: 40px;
+    height: 40px;
+    border: rgba(255, 253, 253, 0.5) 3px solid;
+}
+
+.img_20x20 {
+
+    width: 20px;
+    height: 20px;
+    border: rgba(255, 253, 253, 0.5) 3px solid;
+    opacity: 0.7;
+}
+
+.nav_brand {
+
+    font-size: 1.5rem;
+}
+
+.dropdown_img_40x40_hover {
+
+    border: rgba(255, 253, 253, 0.8) 3px solid;
+}
+
+.notification_in_line {
+
+    height: fit-content;
+    width: fit-content;
+    padding-bottom: 1px;
+}
+
+.img_20x20_hover {
+
+    opacity: 1;
+}
+
+.sign_out_arrow {
+
+    border: 3px solid rgba(255, 253, 253, 0.5);
+    border-right: none;
+    padding-left: 2px;
+    font-size: 12px;
+}
+
+.sign_out_arrow_hover {
+
+    border: 3px solid rgba(255, 253, 253, 0.7);
+    border-right: none;
+}
+
+.settings_container {
+    
+    min-width: 115px;
+}
+
+.m_auto {
+
+    margin: auto;
+}
+
+.settings_buttons {
+    
+    border-bottom: 2px solid white;
+    cursor: pointer;
+}
+
+.settings_buttons:hover {
+
+    background-color: #cecece;
+    color: white !important;
+    font-weight: bold;
+}
+
+.settings_selected_title {
+
+    color: white;
+    background-color: #cecece;
+}
+
+.nav_border_bottom {
+
+    border-bottom: 2px solid #dee2e6;
+}
+
+.user_profile_img {
+
+    width: 170px;
+    height: 170px;
+    border: 5px solid #007bff67;
+}
+
+.color_primary_opacity_medium {
+
+   color: #007bff9c;
+
+}
+
+.btn_add {
+
+    border: 3px solid rgba(255, 253, 253, 0.5);
+    background-color: #28a746;
+    font-size: 21px;
+    color: white;
+}
+
+@media (max-width: 1800px) {
+
+    .width_100_md {
+
+        width: 100%;
+    }
+
+}
+
+@media (min-width: 1800px) {
+
+    .ml_auto_lg {
+
+        margin-left: auto !important;
+    };
+}
+
+.min_width_245 {
+
+    min-width: 300px;
+}
+
+.profile_buttons {
+
+    color: white;
+    background-color: #007bff67;
+    border: none;
+}
+
+.profile_buttons_focused {
+
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: 0 !important;
+    background-color: #007bff;
+}
+
+.profile_buttons:focus {
+
+    outline: 0 !important;
+}
+
+.profile_buttons:hover {
+
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    background-color: #007bff;
+}
+
+.min_width_161 {
+
+    min-width: 161px !important;;
+}
+
+.input_btn_text {
+
+    color: #ced4da;
+    width: 100%;
+    border: 1px solid #ced4da;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+}
+
+.input_btn_text_hover {
+
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.input_btn_text:hover {
+
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.border_primary_x2 {
+
+    border: 2px solid #007bff;
+}
+
+textarea {
+
+    resize: none !important;
+}
+
+.label_for_file {
+
+    position: absolute;
+    font-size: 14px;
+    width: 25%;
+    left: 0;
+    z-index: 1;
+}
+
+.width_48 {
+
+    width: 48% !important;
+}
+
+.emoji_dropdown_menu {
+
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+    background-color: #f8f9fa;
+    box-shadow: 0 0 0 0.2rem rgba(216, 217, 219, 0.5);
+    display: none;
+    width: fit-content;
+    border-top-right-radius: 0.3rem;
+}

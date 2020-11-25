@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {settings_container, m_auto, settings_buttons, settings_selected_title} from './link/Style.module.css';
+import {settings_container, m_auto, settings_buttons, settings_selected_title} from './styles/Style.module.css';
 
 export default function Settings() {
 
