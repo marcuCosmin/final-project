@@ -276,9 +276,42 @@ textarea {
     position: absolute;
     top: 100%;
     z-index: 1000;
-    background-color: #f8f9fa;
+    background-color: white;
     box-shadow: 0 0 0 0.2rem rgba(216, 217, 219, 0.5);
     display: none;
     width: fit-content;
-    border-top-right-radius: 0.3rem;
+    height: 200px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.emoji_dropdown_title {
+
+    background-color: #f8f9fa !important;
+    border-color: #f8f9fa !important;
+}
+
+.emoji_dropdown_title_hover {
+
+    background-color: #e2e6ea !important;
+    border-color: #dae0e5 !important;
+    box-shadow: 0 0 0 0.2rem rgba(216, 217, 219, 0.5) !important;
+}
+
+.emojis_style {
+
+    border-radius: 50%;
+    border: none;
+    background-color: white;
+    outline: 0;
+}
+
+.emojis_style:hover {
+
+    background-color: #ebebeb;
+}
+
+.emojis_style:focus {
+
+    background-color: #f0f0f0;
 }

@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import firebase from 'firebase/app';
 import userStandardImg from './User standard image.jpg';
-import {user_profile_img, color_primary_opacity_medium, min_width_245, profile_buttons, min_width_161, img_40x40, profile_buttons_focused, input_btn_text, input_btn_text_focus, modal_bg, border_primary_x2, label_for_file, opacity_1, btn_primary_hover, width_48, emoji_dropdown_menu} from './styles/Style.module.css';
+import {user_profile_img, color_primary_opacity_medium, min_width_245, profile_buttons, min_width_161, img_40x40, profile_buttons_focused, input_btn_text, input_btn_text_focus, modal_bg, border_primary_x2, label_for_file, opacity_1, btn_primary_hover, width_48, emoji_dropdown_menu, emoji_dropdown_title_hover, emoji_dropdown_title} from './styles/Style.module.css';
 import { authContext } from './global/AuthenticationContext';
 import Emojis from './auxiliary/Render Emojis';
 
@@ -21,6 +21,8 @@ export default function Profile() {
         following: false,
         blocked_users: false
     };
+
+    const [dropdownEmojis, setDropdownEmojis] = useState(false);
 
     const modalRef = useRef(null);
 
@@ -89,11 +91,20 @@ export default function Profile() {
                                 <input type="file" className={`btn custom-file-input ${width_48}`}/>
                                 <label className={`btn btn-success font-weight-bold ${width_48} ${label_for_file}`}>Add Image</label>
 
-                                <div className={`dropdown ml-4 ${width_48}`}>
+                                <div className={`dropdown ml-4 ${width_48}`} onMouseEnter={function() {
 
-                                    <button className={`btn btn-light text-primary font-weight-bold w-100`} type="button">Emoji</button>
+                                    setDropdownEmojis(true);
 
-                                    <div className={`border-top-0 rounded-bottom pb-2 mt-0 d-block ${emoji_dropdown_menu}`}>
+                                }}
+                                onMouseLeave={function() {
+
+                                    setDropdownEmojis(false);
+
+                                }}>
+
+                                    <button className={`btn text-primary font-weight-bold w-100 ${emoji_dropdown_title} ${dropdownEmojis && emoji_dropdown_title_hover}`} type="button">Emojis</button>
+                                    
+                                    <div className={`border-top-0 rounded-bottom pb-2 mt-0 ${emoji_dropdown_menu} ${dropdownEmojis && 'd-block'}`}>
 
                                         <Emojis/>
 

@@ -1,8 +1,9 @@
-import React from 'react'
+import React from 'react';
+import {emojis_style} from '../styles/Style.module.css';
 
 export default function Emojis() {
 
-    const emojiRange = [[128513, 128591], [9986, 10160], [128640, 128704]];
+    const emojiRange = [[128512, 128591], [9986, 10145], [128640, 128702]];
 
     const emojis = [];
 
@@ -10,21 +11,17 @@ export default function Emojis() {
 
         for (let number = array[0]; number < array[array.length - 1]; number++) {
 
-            emojis.push((`&#${number};`));
+            emojis.push((`${number}`));
 
         }
     }
 
-    console.log(Symbol(emojis[0]));
-
-    console.log(emojis);
-
     return (
 
-        <>
+        <div className="w-100 mt-3">
 
-            {emojis.map((emoji) => <input type="button" value={Symbol(emoji)} key={emoji}/>)}
+            {emojis.map((emoji) => <input type="button" className={`p-1 ${emojis_style}`} onClick={function() {console.log('e')}} name={emoji} value={String.fromCodePoint(emoji)} key={emoji}/>)}
 
-        </>
+        </div>
     )
 }
