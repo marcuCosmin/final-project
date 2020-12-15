@@ -1,11 +1,13 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext} from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import {modal_bg, btn_link, w_30, border_primary, float_right_sm, opacity_1, btn_primary_hover, dropdown_title, dropdown_title_hover, img_40x40, nav_brand, dropdown_img_40x40_hover, rounded_0_bottom, notification_in_line, img_20x20, img_20x20_hover, sign_out_arrow, sign_out_arrow_hover, nav_border_bottom} from './styles/Style.module.css';
+import {modal_bg, btn_link, w_30, border_primary, float_right_sm, opacity_1, btn_primary_hover, dropdown_title, dropdown_title_hover, img_40x40, nav_brand, dropdown_img_40x40_hover, rounded_0_bottom, notification_in_line, img_20x20, img_20x20_hover, nav_border_bottom} from './styles/Style.module.css';
 import 'firebase/auth';
 import firebase from 'firebase/app';
 import { authContext } from './global/AuthenticationContext';
 import userStandardImg from './User standard image.jpg';
-import SelectYear from './auxiliary/Render Select Year';
+import SelectYear from './auxiliary/components/Select Year';
+import { faCog, faComment, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Header() {
 
@@ -41,9 +43,9 @@ export default function Header() {
         password: '',
         first: '',
         last: '',
-        month: '',
-        day: '',
-        year: ''
+        month: 'Jan',
+        day: '01',
+        year: '2020'
     };
 
     const inputErrorsInitial = {
@@ -260,20 +262,23 @@ export default function Header() {
         } else {
 
             firebase.auth().createUserWithEmailAndPassword(inputValues.email, inputValues.password).then(function() {
-
+                
                 firebase.auth().currentUser.updateProfile({
 
                     displayName: `${inputValues.first[0].toUpperCase() + inputValues.first.substring(1, inputValues.first.length)} ${inputValues.last[0].toUpperCase() + inputValues.last.substring(1, inputValues.last.length)}`,
 
                 }).then(function() {
     
-                        firebase.auth().currentUser.sendEmailVerification().then(function() {
-                            
-                            setModalConditioner(false);
+                    firebase.auth().currentUser.sendEmailVerification().then(function() {
+
+                        firebase.firestore().collection('users').doc(`${firebase.auth().currentUser.uid}`).set({posts: [], postsIds: []}).then(function() {
+                        
+                            window.location.href = '/';
                             setSignModifier(true);
-                            setInputValues(inputValuesInitial); 
-    
-                        });
+                
+                        })
+
+                    });
 
                 });
 
@@ -351,7 +356,7 @@ export default function Header() {
 
                                     <div className="border-bottom d-flex justify-content-center align-items-center">
 
-                                        <a href="/chat" className="nav-link m-auto">Chat &#128172;</a>
+                                        <a href="/chat" className="nav-link m-auto">Chat <FontAwesomeIcon icon={faComment}/></a>
 
                                         <div className={`bg-danger text-white rounded-circle px-2 ml-auto d-none ${notification_in_line}`}>1</div>
 
@@ -367,11 +372,11 @@ export default function Header() {
 
                                 {!pathSettings && (
 
-                                    <a href="/settings" className="nav-link border-bottom">Settings &#9881;</a>
+                                    <a href="/settings" className="nav-link border-bottom">Settings <FontAwesomeIcon icon={faCog}/></a>
 
                                 )}
 
-                                <div className="btn font-weight-bold nav-link" onMouseEnter={function() {setDropdownHovers( {...dropdownHovers, signOutHover: true})} } onMouseLeave={function() { setDropdownHovers({...dropdownHovers, signOutHover: false})} } onClick={function() { firebase.auth().signOut(); setDropdownToggle(true)}}>Sign Out <span className={`rounded-left ml-1 rounded-bottom rounded-top ${sign_out_arrow} ${dropdownHovers.signOutHover && sign_out_arrow_hover}`}>&#10152;</span></div>
+                                <div className="btn font-weight-bold nav-link" onMouseEnter={function() {setDropdownHovers( {...dropdownHovers, signOutHover: true})} } onMouseLeave={function() { setDropdownHovers({...dropdownHovers, signOutHover: false})} } onClick={function() { firebase.auth().signOut(); setDropdownToggle(true)}}>Sign Out <FontAwesomeIcon icon={faSignOutAlt}/></div>
 
                             </div>
                             
@@ -415,7 +420,7 @@ export default function Header() {
 
                         }}>
 
-                            <div className="modal-dialog">
+                            <div className="modal-dialog shadow">
 
                                 {forgotPass ? (
 

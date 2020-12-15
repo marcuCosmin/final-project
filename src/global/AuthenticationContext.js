@@ -3,23 +3,25 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 
 const authContext = React.createContext({
+
     isSignedIn: false,
     user: null,
     displayName: '',
     emailVerified: false,
     uid: '',
-    photoURL: null
+    photoURL: null,
 });
 
 function ACProvider({children}) {
 
     const [acValues, setAcValues] = useState({
+
         isSignedIn: false,
         user: null,
         displayName: '',
         emailVerified: false,
         uid: '',
-        photoURL: null
+        photoURL: null,
     });
 
     useEffect(function() {
@@ -27,14 +29,14 @@ function ACProvider({children}) {
         firebase.auth().onAuthStateChanged(function (user) {
 
             if (user) {
-              
+            
                 setAcValues({
                     isSignedIn: true,
                     user,
                     displayName: user.displayName,
                     emailVerified: user.emailVerified,
                     uid: user.uid,
-                    photoURL: user.photoURL
+                    photoURL: user.photoURL,
                 });
 
             } else {
@@ -45,10 +47,11 @@ function ACProvider({children}) {
                     displayName: '',
                     emailVerified: false,
                     uid: '',
-                    photoURL: null
+                    photoURL: null,
                 });
 
             }
+
         });
 
     }, []);
