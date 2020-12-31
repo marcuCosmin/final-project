@@ -2,24 +2,26 @@ import React, {useContext, useState, useEffect} from 'react'
 import { authContext } from '../../global/AuthenticationContext';
 import firebase from 'firebase/app';
 import 'firebase/storage';
-import {loading, date, ellipsis, post_comment_btn, ellipsis_menu, ellipsis_items, ellipsis_items_special, ellipsis_hover, comment_input, comment_input_container, comment_input_emoji, post_description} from '../../styles/Style.module.css';
+import {loading, date, ellipsis, post_comment_btn, ellipsis_menu, ellipsis_items, ellipsis_items_special, ellipsis_container, comment_input, comment_input_container, comment_input_submit, comment_input_btns, post_description} from '../../styles/Style.module.css';
 import 'firebase/firestore';
-import { faTrash, faPen, faEllipsisV, faSmileBeam } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPen, faEllipsisV, faSmileBeam, faPaperPlane, faPhotoVideo, faEraser} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function UserPosts() {
 
     const {uid} = useContext(authContext);
 
-    const [userPosts, setUserPosts] = useState([{body: ''}]);
+    const [commentsValues, setCommentsValues] = useState({});
 
-    const [editPosts, setEditPosts] = useState({});
+    const [userPosts, setUserPosts] = useState([{body: ''}]);
 
     const [userPostsBooleans, setUserPostsBooleans] = useState({
 
         exist: false,
         error: false
     });
+
+    console.log(userPosts[0]);
 
     useEffect(function() {
 
@@ -30,14 +32,15 @@ export default function UserPosts() {
                 setUserPostsBooleans({exist: true, error: false});
                 setUserPosts(doc.data().posts.reverse());
 
-                let newEditPosts = {};
+                let newCommentsValues = {};
 
                 for (const element of doc.data().posts) {
 
-                    newEditPosts = {...newEditPosts, [`post-${element.postId}`]: false};
+                    newCommentsValues[`${element.postId}`] = '';
+
                 }
 
-                setEditPosts(newEditPosts);
+                setCommentsValues(newCommentsValues);
  
             } else {
 
@@ -55,7 +58,7 @@ export default function UserPosts() {
 
         <div className="m-auto">
 
-            {userPostsBooleans.exist ? (
+            {userPosts[0].hasOwnProperty('postId') ? (
 
                 userPosts.map(object => 
 
@@ -65,16 +68,16 @@ export default function UserPosts() {
 
                             <span className={`align-self-center font-weight-bold ${date}`}> Posted at: {object.date} {object.hour}</span>
 
-                            <div className="position-relative ml-auto" onMouseEnter={function() {setEditPosts({...editPosts, [`post-${object.postId}`]: true})}} onMouseLeave={function() {setEditPosts({...editPosts, [`post-${object.postId}`]: false})}}>
+                            <div className={`position-relative ml-auto ${ellipsis_container}`}>
 
-                                <button type="button" className={`rounded-circle px-2 border-0 rounded-circle ml-auto align-self-center ${ellipsis} ${editPosts[`post-${object.postId}`] && ellipsis_hover}`}><FontAwesomeIcon icon={faEllipsisV}/></button>
+                                <button type="button" className={`rounded-circle px-2 border-0 rounded-circle ml-auto align-self-center ${ellipsis}`}><FontAwesomeIcon icon={faEllipsisV}/></button>
                                  
-                                <div className={`position-absolute border rounded-bottom ${ellipsis_menu} ${!editPosts[`post-${object.postId}`] && 'd-none'}`}>
+                                <div className={`position-absolute border rounded-bottom ${ellipsis_menu}`}>
 
                                     <button
                                     type="buttton"
                                     className={`w-100 ${[ellipsis_items, ellipsis_items_special].join(' ')}`}
-                                    onClick={function() {firebase.firestore().collection('users').doc(`${uid}`).update({posts: firebase.firestore.FieldValue.arrayRemove(object), postsIds: firebase.firestore.FieldValue.arrayRemove(object.postId)}); firebase.storage().ref().child(`posts/${uid}/${object.postId}`).delete()}}>
+                                    onClick={function() {firebase.firestore().collection('users').doc(`${uid}`).update({posts: firebase.firestore.FieldValue.arrayRemove(object), postsIds: firebase.firestore.FieldValue.arrayRemove(object.postId)}); object.imageUrl && firebase.storage().ref().child(`posts/${uid}/${object.postId}`).delete()}}>
 
                                         <FontAwesomeIcon icon={faTrash}/>
 
@@ -88,7 +91,11 @@ export default function UserPosts() {
 
                         </div>
 
-                        <div className={`m-2 ${post_description}`}>{object.body}</div>
+                        <div className={`p-2 ${post_description}`}>
+
+                            <div>{object.body}</div>
+
+                        </div>
 
                         {object.imageUrl !== "" && (
 
@@ -102,13 +109,25 @@ export default function UserPosts() {
 
                         <button className={`rounded-bottom font-weight-bold rounded-0 bg-light text-center w-100 ${post_comment_btn}`}>Comment</button>
 
-                        <div className={`d-flex ${comment_input_container}`}>
+                        <form className={`d-flex ${comment_input_container}`} onSubmit={function(e) {e.preventDefault(); firebase.firestore().collection('users').doc(`${uid}`).update({comments: firebase.firestore().FieldValue.arrayUnion(commentsValues)})}}>
 
-                            <input type="text" placeholder="Write a comment..." className={`p-2 w-100 ${comment_input}`}/>
+                            {commentsValues.hasOwnProperty(`${object.postId}`) && (
 
-                            <button className={`border-0 ${comment_input_emoji}`} type="button"><FontAwesomeIcon icon={faSmileBeam}/></button>
+                                <>
 
-                        </div>
+                                    <input type="text" placeholder="Write a comment..." value={commentsValues[`${object.postId}`]} className={`p-2 w-100 ${comment_input}`} onChange={function(e) {setCommentsValues({...commentsValues, [object.postId]: e.target.value});}}/>
+                                    <button className={`border-0 ${comment_input_btns}`} type="button" disabled={!commentsValues[`${object.postId}`].length > 0} onClick={function() {setCommentsValues({...commentsValues, [`${object.postId}`]: ''})}}><FontAwesomeIcon icon={faEraser}/></button>
+                                    <button className={`border-0 ${comment_input_btns}`} type="button"><FontAwesomeIcon icon={faPhotoVideo}/></button>
+                                    <button className={`border-0 ${comment_input_btns}`} type="button"><FontAwesomeIcon icon={faSmileBeam}/></button>
+                                    <button className={`border-0 ${comment_input_btns}`} type="submit" disabled={!commentsValues[`${object.postId}`].replace(/\s/g, '').length}><FontAwesomeIcon icon={faPaperPlane}/></button>
+
+                                </>
+                            
+                            )}
+
+
+
+                        </form>
 
                     </div>
 

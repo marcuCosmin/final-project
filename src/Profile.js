@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import firebase from 'firebase/app';
 import userStandardImg from './User standard image.jpg';
-import {user_profile_img, color_primary_opacity_medium, min_width_245, profile_buttons, min_width_161, img_40x40, profile_buttons_focused, input_btn_text, input_btn_text_hover, img_40x40_hover, modal_bg, border_primary_x2, label_for_file, opacity_1, btn_primary_hover, width_48, emoji_dropdown_menu, emoji_dropdown_title_hover, emoji_dropdown_title, write_post_container, preview_image} from './styles/Style.module.css';
+import {user_profile_img, color_primary_opacity_medium, min_width_245, profile_buttons, min_width_161, img_40x40, profile_buttons_focused, input_btn_text, modal_bg, border_primary_x2, label_for_file, opacity_1, btn_primary, width_48, emoji_dropdown_menu, emoji_dropdown_title_hover, emoji_dropdown_title, write_post_container, preview_image, close_preview, preview_image_container} from './styles/Style.module.css';
 import { authContext } from './global/AuthenticationContext';
 import Emojis from './auxiliary/components/Emojis';
 import 'firebase/firestore';
@@ -45,10 +45,6 @@ export default function Profile() {
 
     const [deviceWidth, setDeviceWidth] = useState(0);
 
-    const [writePostHovered, setWritePostHovered] = useState(false);
-
-    postImageRef.current && console.log(postImageRef.current.value === "");
-
     window.addEventListener('resize', function() {setDeviceWidth(window.innerWidth)});
 
     useEffect(function () {
@@ -84,13 +80,24 @@ export default function Profile() {
         return newId;
     }
 
+    function escapePosts(e) {
+
+        if (e.key === 'Escape') {
+            setModal(false);
+            setInputValues(inputValuesInital);
+            setUploadImage({visible: false, src: ''});
+            postImageRef.current.value = null;
+            window.removeEventListener('keyup', escapePosts);
+        }
+    }
+
     return (
 
         <div className={`m-auto pr-4 pl-4 pt-4 ${deviceWidth < 1250 ? 'w-75' : 'w-50'} ${min_width_245}`}>
 
             {/* Modal */}
 
-            <div className={`modal ${modal_bg} ${modal && "d-block"}`} tabIndex="-1" onKeyUp={function(e) {if (e.key === 'Escape') {setModal(false); setInputValues(inputValuesInital); setUploadImage({visible: false, src: ''}); postImageRef.current.value = null;}}}>
+            <div className={`modal ${modal_bg} ${modal && "d-block"}`} tabIndex="-1">
 
                 <div className="modal-dialog shadow" role="document">
                     
@@ -113,6 +120,7 @@ export default function Profile() {
                                         body: inputValues.post,
                                         hour: `${new Date().getHours().toString().length === 1 ? `0${new Date().getHours()}` : new Date().getHours()}:${(new Date().getMinutes()).toString().length === 1 ?  `0${new Date().getMinutes()}` : new Date().getMinutes()}`,
                                         imageUrl,
+                                        comments: [],
                                         postId: id
                                     })
         
@@ -125,24 +133,23 @@ export default function Profile() {
                             firebase.firestore().collection("users").doc(`${uid}`).update({
     
                                 posts: firebase.firestore.FieldValue.arrayUnion({
-                                    date: `${(new Date().getMonth()).toString().length === 1 ? `0${new Date().getMonth() + 1}` : new Date().getMonth() + 1}.${(new Date().getDate()).toString().length === 1 ? `0${new Date().getDate()}` : new Date().getDate()}.${new Date().getFullYear()}`,
+                                    date: `${(new Date().getMonth()).toString().length === 1 ? `0${new Date().getMonth() + 1}` : new Date().getMonth() + 1}-${(new Date().getDate()).toString().length === 1 ? `0${new Date().getDate()}` : new Date().getDate()}-${new Date().getFullYear()}`,
                                     body: inputValues.post,
                                     hour: `${new Date().getHours().toString().length === 1 ? `0${new Date().getHours()}` : new Date().getHours()}:${(new Date().getMinutes()).toString().length === 1 ?  `0${new Date().getMinutes()}` : new Date().getMinutes()}`,
                                     imageUrl: '',
+                                    comments: [],
                                     postId: id
                                 })
     
                             }, {merge: true}).then(function() {setModal(false); setInputValues(inputValuesInital); setUploadImage({visible: false, src: ''}); postImageRef.current.value = null; });
                         }
-
-                          
                         
                     }}>
 
                         <div className="modal-header">
 
                             <h5 className="modal-title w-100 text-primary text-center">Create post</h5>
-                            <button type="button" className={`close btn text-primary ${opacity_1} ${btn_primary_hover}`} onClick={function() {setModal(false); setInputValues(inputValuesInital); setUploadImage({visible: false, src: ''}); postImageRef.current.value = null;}}>&times;</button>
+                            <button type="button" className={`close p-2 btn text-primary ${opacity_1} ${btn_primary}`} onClick={function() {setModal(false); setInputValues(inputValuesInital); setUploadImage({visible: false, src: ''}); postImageRef.current.value = null;}}>&times;</button>
 
                         </div>
 
@@ -164,10 +171,10 @@ export default function Profile() {
 
                             <div className="d-flex justify-content-center mt-3">
 
-                                <div className="w-50">
+                                <div className={`w-50 ${preview_image_container}`}>
 
-                                    <img src={uploadImage.src} alt="" className={`w-100 position-relative rounded ${preview_image} ${!uploadImage.visible && "d-none"}`}/>
-                                    <button type="button" className={`close position-absolute btn text-primary ${opacity_1} ${btn_primary_hover}`} onClick={function() {setUploadImage({visible: false, src: ''}); postImageRef.current.value = null;}}>&times;</button>
+                                    <button type="button" className={`close position-relative btn ${opacity_1} ${close_preview}`} onClick={function() {setUploadImage({visible: false, src: ''}); postImageRef.current.value = null;}}>&times;</button>
+                                    <img src={uploadImage.src} alt="" className={`w-100 postion-absolute rounded ${preview_image} ${!uploadImage.visible && "d-none"}`}/>
 
                                 </div>
 
@@ -226,7 +233,7 @@ export default function Profile() {
 
                         <div className="modal-footer">
 
-                            <button className="btn btn-primary form-control" disabled={!inputValues.post || postImageRef.current.value === ""}>Post</button>
+                            <button className="btn btn-primary form-control" disabled={!(inputValues.post.replace(/\s/g, '').length || uploadImage.visible) && true}>Post</button>
 
                         </div>
 
@@ -248,14 +255,14 @@ export default function Profile() {
 
                 {deviceWidth > 924 && (
 
-                <div className="d-flex justify-content-center">
+                    <div className="d-flex justify-content-center">
 
-                    <button type="button" className={`rounded font-weight-bold w-25 mr-2 ${profile_buttons} ${contentSwitcher.posts && profile_buttons_focused}`} onClick={function() {setContentSwitcher({...contentSwitcherInitial, posts: true})}}>Posts</button>
-                    <button type="button" className={`rounded font-weight-bold w-25 mr-2 ${profile_buttons} ${contentSwitcher.followers && profile_buttons_focused}`} onClick={function() {setContentSwitcher({...contentSwitcherInitial, followers: true})}}>Followers</button>
-                    <button type="button" className={`rounded font-weight-bold w-25 mr-2 ${profile_buttons} ${contentSwitcher.following && profile_buttons_focused}`} onClick={function() {setContentSwitcher({...contentSwitcherInitial, following: true})}}>Following</button>
-                    <button type="button" className={`rounded font-weight-bold w-25 ${profile_buttons} ${contentSwitcher.blocked_users && profile_buttons_focused}`} onClick={function() {setContentSwitcher({...contentSwitcherInitial, blocked_users: true})}}>Blocked users</button>
-                
-                </div>
+                        <button type="button" className={`rounded font-weight-bold w-25 mr-2 ${profile_buttons} ${contentSwitcher.posts && profile_buttons_focused}`} onClick={function() {setContentSwitcher({...contentSwitcherInitial, posts: true})}}>Posts</button>
+                        <button type="button" className={`rounded font-weight-bold w-25 mr-2 ${profile_buttons} ${contentSwitcher.followers && profile_buttons_focused}`} onClick={function() {setContentSwitcher({...contentSwitcherInitial, followers: true})}}>Followers</button>
+                        <button type="button" className={`rounded font-weight-bold w-25 mr-2 ${profile_buttons} ${contentSwitcher.following && profile_buttons_focused}`} onClick={function() {setContentSwitcher({...contentSwitcherInitial, following: true})}}>Following</button>
+                        <button type="button" className={`rounded font-weight-bold w-25 ${profile_buttons} ${contentSwitcher.blocked_users && profile_buttons_focused}`} onClick={function() {setContentSwitcher({...contentSwitcherInitial, blocked_users: true})}}>Blocked users</button>
+                    
+                    </div>
 
                 )}
 
@@ -284,11 +291,11 @@ export default function Profile() {
 
                     <div className="border rounded-0 p-3">
 
-                        <div className={`d-flex p-2 rounded ${write_post_container}`} onMouseEnter={function() {setWritePostHovered(true)}} onMouseLeave={function() {setWritePostHovered(false)}} onClick={function() {setModal(true); setTimeout(() => modalRef.current.focus(), 0)}}>
+                        <div className={`d-flex p-2 rounded ${write_post_container}`} onClick={function() {setModal(true); window.addEventListener('keyup', escapePosts); setTimeout(() => modalRef.current.focus(), 0)}}>
 
-                            <img className={`rounded-circle mr-3 ${img_40x40} ${writePostHovered && img_40x40_hover}`} src={userStandardImg} alt=""/>
+                            <img className={`rounded-circle mr-3 ${img_40x40}`} src={userStandardImg} alt=""/>
 
-                            <div className={`rounded text-align-left bg-white ${input_btn_text} ${writePostHovered && input_btn_text_hover}`} type="button">Write post</div>
+                            <div className={`rounded text-align-left bg-white ${input_btn_text}`} type="button">Write post</div>
 
                         </div>
 

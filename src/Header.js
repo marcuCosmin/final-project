@@ -1,6 +1,6 @@
-import React, { useState, useContext} from 'react';
+import React, { useState, useContext, useRef} from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import {modal_bg, btn_link, w_30, border_primary, float_right_sm, opacity_1, btn_primary_hover, dropdown_title, dropdown_title_hover, img_40x40, nav_brand, dropdown_img_40x40_hover, rounded_0_bottom, notification_in_line, img_20x20, img_20x20_hover, nav_border_bottom} from './styles/Style.module.css';
+import {modal_bg, btn_link, w_30, border_primary, float_right_sm, opacity_1, btn_primary, dropdown_title, img_40x40, nav_brand, rounded_0_bottom, notification_in_line, img_20x20, nav_border_bottom, dropdown_item_img, dropdown_header, up_back_to_in_container, input_autofilled, dropdown_toggle} from './styles/Style.module.css';
 import 'firebase/auth';
 import firebase from 'firebase/app';
 import { authContext } from './global/AuthenticationContext';
@@ -13,15 +13,19 @@ export default function Header() {
 
     const {isSignedIn, photoURL, uid, displayName} = useContext(authContext);
 
-    const [dropdownHovers, setDropdownHovers] = useState({
-
-        viewProfileHover: false,
-        singOutHover: false
-    });
-
     const pathViewProfile = (useLocation().pathname === `/${displayName}_${uid}`);
     const pathSettings = (useLocation().pathname === "/settings");
     const pathChat = (useLocation().pathname === "/chat");
+
+    const focusRef = useRef(null);
+
+    const rememberCheckBoxRef = useRef(null);
+
+    const rememberLabelRef = useRef(null);
+
+    const signPasswordRef = useRef(null);
+
+    const signResetRef = useRef(null);
 
     // Modifying the modal
 
@@ -33,16 +37,14 @@ export default function Header() {
 
     // Modifying the modal
 
-    const [dropdownToggle, setDropdownToggle] = useState(true);
-
     // Inputs
 
     const inputValuesInitial = {
 
         email: '',
         password: '',
-        first: '',
-        last: '',
+        firstname: '',
+        lastname: '',
         month: 'Jan',
         day: '01',
         year: '2020'
@@ -59,8 +61,8 @@ export default function Header() {
 
         email: false,
         password: false,
-        first: false,
-        last: false,
+        firstname: false,
+        lastname: false,
         year: false,
         month: false,
         day: false
@@ -93,13 +95,13 @@ export default function Header() {
 
         }
 
-        if (e.target.name === 'first') {
+        if (e.target.name === 'firstname') {
 
             setInputValues({...inputValues, [e.target.name]: e.target.value.substring(0, 15)});
 
         }
 
-        if (e.target.name === 'last') {
+        if (e.target.name === 'lastname') {
             
             setInputValues({...inputValues, [e.target.name]: e.target.value.substring(0, 15 )});
             
@@ -161,27 +163,27 @@ export default function Header() {
             
         if (!signModifier) {
 
-            if (!(/^[a-zA-Z]*$/.test(inputValues.first)) || inputValues.first === "" || inputValues.first.length < 3) {
+            if (!(/^[a-zA-Z]*$/.test(inputValues.firstname)) || inputValues.firstname === "" || inputValues.firstname.length < 3) {
 
-                updatedErrors.first = true;
+                updatedErrors.firstname = true;
     
                 validationBoolean = false;
     
             } else {
     
-                updatedErrors.first = false;
+                updatedErrors.firstname = false;
     
             }
     
-            if (!(/^[a-zA-Z]*$/.test(inputValues.last)) ||  inputValues.last === "" || inputValues.last.length < 3) {
+            if (!(/^[a-zA-Z]*$/.test(inputValues.lastname)) ||  inputValues.lastname === "" || inputValues.lastname.length < 3) {
     
-                updatedErrors.last = true;
+                updatedErrors.lastname = true;
     
                 validationBoolean = false;
     
             } else {
     
-                updatedErrors.last = false;
+                updatedErrors.lastname = false;
     
             }
     
@@ -249,6 +251,16 @@ export default function Header() {
 
             firebase.auth().signInWithEmailAndPassword(inputValues.email.toLowerCase().replace(/\s/g, ''), inputValues.password).then(function() {
 
+                if (rememberCheckBoxRef.current.checked) {
+
+                    document.cookie = `email=${inputValues.email}; expires=27 June ${new Date().getFullYear() + 10} 00:00:00`;
+
+                } else {
+
+                    document.cookie = `email=${inputValues.email}; expires=27 June 2000 00:00:00 `;
+
+                }
+
                 setModalConditioner(false);
                 setSignModifier(true);
                 setInputValues(inputValuesInitial);
@@ -265,13 +277,13 @@ export default function Header() {
                 
                 firebase.auth().currentUser.updateProfile({
 
-                    displayName: `${inputValues.first[0].toUpperCase() + inputValues.first.substring(1, inputValues.first.length)} ${inputValues.last[0].toUpperCase() + inputValues.last.substring(1, inputValues.last.length)}`,
+                    displayName: `${inputValues.firstname[0].toUpperCase() + inputValues.firstname.substring(1, inputValues.firstname.length)} ${inputValues.lastname[0].toUpperCase() + inputValues.lastname.substring(1, inputValues.lastname.length)}`,
 
                 }).then(function() {
     
                     firebase.auth().currentUser.sendEmailVerification().then(function() {
 
-                        firebase.firestore().collection('users').doc(`${firebase.auth().currentUser.uid}`).set({posts: [], postsIds: []}).then(function() {
+                        firebase.firestore().collection('users').doc(`${firebase.auth().currentUser.uid}`).set({posts: [], postsIds: [], commentsIds: []}).then(function() {
                         
                             window.location.href = '/';
                             setSignModifier(true);
@@ -322,6 +334,21 @@ export default function Header() {
 
     // Function - Sign
 
+    function escapeSign(e) {
+
+        if (e.key === "Escape") {
+
+            setModalConditioner(false);
+            setSignModifier(true);
+            setInputValues(inputValuesInitial);
+            setForgotPass(false);
+            setResetFailed(false);
+            setInputErrors(inputErrorsInitial);
+            setErrorBorders(errorBordersInitial);
+            window.removeEventListener('keyup', escapeSign);
+        }
+    }
+
     return (
 
         <nav className={`navbar navbar-expand navbar-dark bg-primary font-weight-bold py-0 ${nav_border_bottom}`}>
@@ -336,13 +363,13 @@ export default function Header() {
 
                     <li className="nav-item ml-auto">
 
-                        <div className="dropdown" onMouseEnter={function () {dropdownToggle ? setDropdownToggle(false) : setDropdownToggle(true)}} onMouseLeave={function() {setDropdownToggle(true)}}>
+                        <div className={`dropdown ${dropdown_header}`}>
 
-                            <div className={`btn font-weight-bold text-nowrap rounded-top border-0 d-flex pb-1 ${rounded_0_bottom} ${dropdown_title} ${!dropdownToggle && dropdown_title_hover}`}>
+                            <div className={`btn font-weight-bold text-nowrap rounded-top border-0 d-flex pb-1 ${rounded_0_bottom} ${dropdown_title}`}>
 
                                 <div>
 
-                                    <img src={photoURL === null ? userStandardImg : photoURL} alt="" className={`float-left rounded-circle mr-1 ${img_40x40} ${!dropdownToggle && dropdown_img_40x40_hover}`}/>
+                                    <img src={photoURL === null ? userStandardImg : photoURL} alt="" className={`float-left rounded-circle mr-1 ${img_40x40}`}/>
 
                                 </div>
 
@@ -350,7 +377,7 @@ export default function Header() {
 
                             </div>
 
-                            <div className={`position-absolute rounded-bottom w-100 text-center border bg-primary pl-2 pr-2 ${dropdownToggle && 'd-none'}`}>
+                            <div className={`position-absolute rounded-bottom w-100 text-center border bg-primary pl-2 pr-2 ${dropdown_toggle}`}>
 
                                 {!pathChat && (
 
@@ -366,7 +393,7 @@ export default function Header() {
 
                                 {!pathViewProfile && (
 
-                                    <a href={`/${displayName}_${uid}`} className="nav-link border-bottom" onMouseEnter={function() { setDropdownHovers({...dropdownHovers, viewProfileHover: true}) }} onMouseLeave={function () { setDropdownHovers({...dropdownHovers, viewProfileHover: false})}}>View Profile <img className={`rounded-circle ${img_20x20} ${dropdownHovers.viewProfileHover && img_20x20_hover}`} src={photoURL === null ? userStandardImg : photoURL} alt=""/></a>
+                                    <a href={`/${displayName}_${uid}`} className={`nav-link border-bottom ${dropdown_item_img}`}>View Profile <img className={`rounded-circle ${img_20x20}`} src={photoURL === null ? userStandardImg : photoURL} alt=""/></a>
 
                                 )}
 
@@ -376,7 +403,7 @@ export default function Header() {
 
                                 )}
 
-                                <div className="btn font-weight-bold nav-link" onMouseEnter={function() {setDropdownHovers( {...dropdownHovers, signOutHover: true})} } onMouseLeave={function() { setDropdownHovers({...dropdownHovers, signOutHover: false})} } onClick={function() { firebase.auth().signOut(); setDropdownToggle(true)}}>Sign Out <FontAwesomeIcon icon={faSignOutAlt}/></div>
+                                <div className="btn font-weight-bold nav-link" onClick={function() { firebase.auth().signOut();}}>Sign Out <FontAwesomeIcon icon={faSignOutAlt}/></div>
 
                             </div>
                             
@@ -394,6 +421,25 @@ export default function Header() {
                         onClick={function() {
 
                             setModalConditioner(true);
+                            window.addEventListener('keyup', escapeSign);
+                            
+                            if (document.cookie.includes('email=')) {
+                            
+                                let cookiesEmail = document.cookie.split(';');
+                                const cookiesEmailIndex = cookiesEmail.findIndex(el => el.includes('email='));
+
+                                cookiesEmail = cookiesEmail[cookiesEmailIndex].split('=')[1];
+                                setInputValues({...inputValues, email: cookiesEmail});
+                                rememberCheckBoxRef.current.checked = true;
+                                focusRef.current.classList.add(input_autofilled);
+                                focusRef.current.addEventListener('input', () => focusRef.current.classList.remove(input_autofilled));
+                                setTimeout(() => signPasswordRef.current.focus(), 0);
+
+                            } else {
+
+                                setTimeout(() => focusRef.current.focus(), 0);
+
+                            }
 
                         }}>
                             Sign in
@@ -401,24 +447,7 @@ export default function Header() {
 
                         {/* Modal */}
 
-                        <div
-                        className={`modal ${modal_bg} ${modalConditioner && 'd-block'}`}
-                        tabIndex="-1"
-                        onKeyUp={function(e) {
-
-                            if (e.key === 'Escape') {
-
-                                setModalConditioner(false);
-                                setSignModifier(true);
-                                setInputValues(inputValuesInitial);
-                                setForgotPass(false);
-                                setResetFailed(false);
-                                setInputErrors(inputErrorsInitial);
-                                setErrorBorders(errorBordersInitial);
-
-                            }
-
-                        }}>
+                        <div className={`modal ${modal_bg} ${modalConditioner && 'd-block'}`} tabIndex="-1">
 
                             <div className="modal-dialog shadow">
 
@@ -434,7 +463,7 @@ export default function Header() {
 
                                                 <button
                                                 type="button"
-                                                className={`close p-1 btn text-primary ${opacity_1} ${btn_primary_hover}`}
+                                                className={`close p-1 btn text-primary ${opacity_1} ${btn_primary}`}
                                                 onClick={function() {
 
                                                     setModalConditioner(false);
@@ -444,8 +473,6 @@ export default function Header() {
                                                     setResetFailed(false);
                                                     setInputErrors(inputErrorsInitial);
                                                     setErrorBorders(errorBordersInitial);
-
-
                                                 }}>
 
                                                     &times;
@@ -458,7 +485,7 @@ export default function Header() {
 
                                                 <p>Please provide your email adress in order to reset your password:</p>
 
-                                                <input type="text" placeholder="Email" className={`form-control mb-2 ${resetFailed && 'is-invalid'}`} autoComplete="username" name="email" onChange={inputControl} value={inputValues.email}/>
+                                                <input type="text" ref={focusRef} placeholder="Email" className={`form-control mb-2 ${resetFailed && 'is-invalid'}`} autoComplete="username" name="email" onChange={inputControl} value={inputValues.email}/>
 
                                                 <div className={`invalid-feedback d-block`}>{inputErrors.reset}</div>
 
@@ -466,13 +493,35 @@ export default function Header() {
 
                                             <div className="modal-footer">
 
-                                                <button className="btn btn-primary form-control">Send reset password email</button>
+                                                <button className="btn btn-primary form-control" ref={signResetRef}>Send reset password email</button>
 
                                             </div>
 
                                             <div className="modal-footer">
 
-                                                <button type="button" className="btn btn-primary form-control" onClick={function() {setForgotPass(false); setInputValues(inputValuesInitial); setResetFailed(false); setInputErrors(inputErrorsInitial); setErrorBorders(errorBordersInitial); }}>Back to sign in</button>
+                                                <button type="button" className="btn btn-primary form-control" onClick={async function() {
+
+                                                    await setForgotPass(false);
+                                                    setInputValues(inputValuesInitial);
+                                                    setResetFailed(false); setInputErrors(inputErrorsInitial);
+                                                    setErrorBorders(errorBordersInitial);
+                                                    if (document.cookie.includes('email=')) {
+                            
+                                                        let cookiesEmail = document.cookie.split(';');
+                                                        const cookiesEmailIndex = cookiesEmail.findIndex(el => el.includes('email='));
+
+                                                        cookiesEmail = cookiesEmail[cookiesEmailIndex].split('=')[1];
+                                                        setInputValues({...inputValues, email: cookiesEmail});
+                                                        focusRef.current.classList.add(input_autofilled);
+                                                        focusRef.current.addEventListener('input', () => focusRef.current.classList.remove(input_autofilled));
+                                                        rememberCheckBoxRef.current.checked = true;
+                                                        setTimeout(() => signPasswordRef.current.focus(), 0);
+
+                                                    } else {
+
+                                                        setTimeout(() => focusRef.current.focus(), 0);
+
+                                                    }} }>Back to sign in</button>
 
                                             </div>
 
@@ -495,7 +544,7 @@ export default function Header() {
                                                     <h4 className="modal-title text-center w-100 text-primary font-weight-bold">Sign in</h4>
                                                     <button
                                                     type="button"
-                                                    className={`close p-0 btn text-primary ${opacity_1} ${btn_primary_hover}`}
+                                                    className={`close p-0 btn text-primary ${opacity_1} ${btn_primary}`}
                                                     aria-label="Close"
                                                     onClick={function() {
 
@@ -512,15 +561,38 @@ export default function Header() {
 
                                                 <div className="modal-body">
 
-                                                    <input type="text" placeholder="Email" className={`form-control mb-2 ${errorBorders.email && 'is-invalid'}`} autoComplete="username" name="email" onChange={inputControl} value={inputValues.email}/>
-                                                    <input type="password" placeholder="Password" className={`form-control ${errorBorders.password && 'is-invalid'}`} autoComplete="current-password" name="password" onChange={inputControl} value={inputValues.password}/>
+                                                    <input type="text" placeholder="Email" ref={focusRef} className={`form-control mb-2 ${errorBorders.email && 'is-invalid'}`} autoComplete="username" name="email" onChange={inputControl} value={inputValues.email}/>
+                                                    <input type="password" placeholder="Password" ref={signPasswordRef} className={`form-control ${errorBorders.password && 'is-invalid'}`} autoComplete="current-password" name="password" onChange={inputControl} value={inputValues.password}/>
 
 
                                                     <div className="custom-control custom-checkbox mt-3">
 
-                                                        <input type="checkbox" className="custom-control-input" id="customCheck1"/>
-                                                        <label className="custom-control-label mr-2" htmlFor="customCheck1">Remember email</label>
-                                                        <span className={`${float_right_sm} ${btn_link}`} onClick={function() { setForgotPass(true); setInputValues(inputValuesInitial); setErrorBorders(errorBordersInitial); setInputErrors(inputErrorsInitial); }}>Forgot your password ?</span>
+                                                        <input type="checkbox" className="custom-control-input" ref={rememberCheckBoxRef} id="customCheck1"/>
+                                                        <label className="custom-control-label mr-2" ref={rememberLabelRef} htmlFor="customCheck1">Remember email</label>
+                                                        <span className={`${float_right_sm} ${btn_link}`} tabIndex="0"
+                                                        onClick={async function() {
+                                                            await setForgotPass(true);
+                                                            setInputValues(inputValuesInitial);
+                                                            setErrorBorders(errorBordersInitial);
+                                                            setInputErrors(inputErrorsInitial);
+                                                            setTimeout(() => focusRef.current.focus(), 0);
+                                                            if (document.cookie.includes('email=')) {
+                                    
+                                                                let cookiesEmail = document.cookie.split(';');
+                                                                const cookiesEmailIndex = cookiesEmail.findIndex(el => el.includes('email='));
+        
+                                                                cookiesEmail = cookiesEmail[cookiesEmailIndex].split('=')[1];
+                                                                focusRef.current.classList.add(input_autofilled);
+                                                                focusRef.current.addEventListener('input', () => focusRef.current.classList.remove(input_autofilled));
+                                                                setInputValues({...inputValues, email: cookiesEmail});
+                                                                setTimeout(() => signResetRef.current.focus(), 0);
+        
+                                                            } else {
+        
+                                                                setTimeout(() => focusRef.current.focus(), 0);
+        
+                                                            }
+                                                        }}>Forgot your password ?</span>
 
                                                     </div>
 
@@ -542,7 +614,8 @@ export default function Header() {
                                                         setSignModifier(false);
                                                         setInputValues(inputValuesInitial);
                                                         setErrorBorders(errorBordersInitial);
-                                                        setInputErrors(inputErrorsInitial)
+                                                        setInputErrors(inputErrorsInitial);
+                                                        setTimeout(() => focusRef.current.focus(), 0);
 
                                                     }}/>
 
@@ -561,7 +634,7 @@ export default function Header() {
                                                     <h4 className="modal-title text-center w-100 text-primary font-weight-bold">Sign up</h4>
                                                     <button
                                                     type="button"
-                                                    className={`close p-0 btn text-primary ${opacity_1} ${btn_primary_hover}`}
+                                                    className={`close p-0 btn text-primary ${opacity_1} ${btn_primary}`}
                                                     aria-label="Close"
                                                     onClick={function() {
 
@@ -585,13 +658,13 @@ export default function Header() {
 
                                                         <div className="col-sm mb-2">
 
-                                                            <input type="text" placeholder="First name" name="first" className={`form-control ${errorBorders.first && 'is-invalid'}`} onChange={inputControl} value={inputValues.first}/>
+                                                            <input type="text" placeholder="First name" ref={focusRef} name="firstname" className={`form-control ${errorBorders.firstname && 'is-invalid'}`} onChange={inputControl} value={inputValues.firstname}/>
 
                                                         </div>
 
                                                         <div className="col-sm mb-2">
 
-                                                            <input type="text" placeholder="Last name" name="last" className={`form-control ${errorBorders.last && 'is-invalid'}`} onChange={inputControl} value={inputValues.last}/>
+                                                            <input type="text" placeholder="Last name" name="lastname" className={`form-control ${errorBorders.lastname && 'is-invalid'}`} onChange={inputControl} value={inputValues.lastname}/>
 
                                                         </div>
 
@@ -693,9 +766,32 @@ export default function Header() {
 
                                                 </div>
 
-                                                <div className="modal-footer justify-content-center">
+                                                <div className={`modal-footer ${up_back_to_in_container}`}>
 
-                                                    <span>Already got an account? <span className={`${btn_link}`} onClick={function() { setSignModifier(true); setInputValues(inputValuesInitial); setErrorBorders(errorBordersInitial); setInputErrors(inputErrorsInitial)}}>Sign in</span></span>
+                                                    <span>Already got an account? <span className={`${btn_link}`} tabIndex="0"
+                                                    onClick={async function() {
+                                                        await setSignModifier(true);
+                                                        setInputValues(inputValuesInitial);
+                                                        setErrorBorders(errorBordersInitial);
+                                                        setInputErrors(inputErrorsInitial);
+                                                        if (document.cookie.includes('email=')) {
+                                
+                                                            let cookiesEmail = document.cookie.split(';');
+                                                            const cookiesEmailIndex = cookiesEmail.findIndex(el => el.includes('email='));
+                                                            focusRef.current.classList.add(input_autofilled);
+                                                            focusRef.current.addEventListener('input', () => focusRef.current.classList.remove(input_autofilled));
+                                                            cookiesEmail = cookiesEmail[cookiesEmailIndex].split('=')[1];
+                                                            setInputValues({...inputValues, email: cookiesEmail});
+                                                            rememberCheckBoxRef.current.checked = true;
+                                                            setTimeout(() => signPasswordRef.current.focus(), 0);
+    
+                                                        } else {
+    
+                                                            setTimeout(() => focusRef.current.focus(), 0);
+    
+                                                        }
+                                                        
+                                                    }}>Sign in</span></span>
 
                                                 </div>
 
