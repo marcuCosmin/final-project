@@ -1,2 +1,2 @@
-# final-project
+# Social media platform
 ## Not finished!
