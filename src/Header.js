@@ -1,12 +1,12 @@
 import React, { useState, useContext, useRef} from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import {modal_bg, btn_link, w_30, border_primary, float_right_sm, opacity_1, btn_primary, dropdown_title, img_40x40, nav_brand, rounded_0_bottom, notification_in_line, img_20x20, nav_border_bottom, dropdown_item_img, dropdown_header, up_back_to_in_container, input_autofilled, dropdown_toggle} from './styles/Style.module.css';
+import {modal_bg, btn_link, w_30, border_primary, float_right_sm, opacity_1, btn_primary, dropdown_title, img_40x40, nav_brand, rounded_0_bottom, notification_in_line, img_20x20, nav_border_bottom, dropdown_item_img, dropdown_header, up_back_to_in_container, input_autofilled, dropdown_toggle, back_modal, sign_select} from './styles/Style.module.css';
 import 'firebase/auth';
 import firebase from 'firebase/app';
 import { authContext } from './global/AuthenticationContext';
 import userStandardImg from './User standard image.jpg';
 import SelectYear from './auxiliary/components/Select Year';
-import { faCog, faComment, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCog, faComment, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Header() {
@@ -283,7 +283,7 @@ export default function Header() {
     
                     firebase.auth().currentUser.sendEmailVerification().then(function() {
 
-                        firebase.firestore().collection('users').doc(`${firebase.auth().currentUser.uid}`).set({posts: [], postsIds: [], commentsIds: []}).then(function() {
+                        firebase.firestore().collection('users').doc(`${firebase.auth().currentUser.uid}`).set({posts: [], postsIds: [], commentsIds: [], joinDate: new Date(), birthday: `${inputValues.month} ${inputValues.day}, ${inputValues.year}`}).then(function() {
                         
                             window.location.href = '/';
                             setSignModifier(true);
@@ -351,9 +351,9 @@ export default function Header() {
 
     return (
 
-        <nav className={`navbar navbar-expand navbar-dark bg-primary font-weight-bold py-0 ${nav_border_bottom}`}>
+        <nav className={`navbar fixed-top navbar-expand navbar-dark bg-primary font-weight-bold py-0 ${nav_border_bottom}`}>
 
-            <span className={`navbar-brand ${nav_brand}`} to="/">Socialize it</span>
+            <Link className={`navbar-brand ${nav_brand}`} to="/">Socialize it</Link>
 
             <div className="collapse navbar-collapse">
 
@@ -459,6 +459,30 @@ export default function Header() {
 
                                             <div className="modal-header">
 
+                                                <button type="button" className={`p-1 rounded border-0 bg-white text-primary ${back_modal} ${btn_primary}`} onClick={async function() {
+
+                                                await setForgotPass(false);
+                                                setInputValues(inputValuesInitial);
+                                                setResetFailed(false); setInputErrors(inputErrorsInitial);
+                                                setErrorBorders(errorBordersInitial);
+                                                if (document.cookie.includes('email=')) {
+
+                                                    let cookiesEmail = document.cookie.split(';');
+                                                    const cookiesEmailIndex = cookiesEmail.findIndex(el => el.includes('email='));
+
+                                                    cookiesEmail = cookiesEmail[cookiesEmailIndex].split('=')[1];
+                                                    setInputValues({...inputValues, email: cookiesEmail});
+                                                    focusRef.current.classList.add(input_autofilled);
+                                                    focusRef.current.addEventListener('input', () => focusRef.current.classList.remove(input_autofilled));
+                                                    rememberCheckBoxRef.current.checked = true;
+                                                    setTimeout(() => signPasswordRef.current.focus(), 0);
+
+                                                } else {
+
+                                                    setTimeout(() => focusRef.current.focus(), 0);
+
+                                                }} }><FontAwesomeIcon icon={faArrowLeft}/></button>
+
                                                 <h5 className="modal-title text-primary text-center w-100">Reset your password</h5>
 
                                                 <button
@@ -494,34 +518,6 @@ export default function Header() {
                                             <div className="modal-footer">
 
                                                 <button className="btn btn-primary form-control" ref={signResetRef}>Send reset password email</button>
-
-                                            </div>
-
-                                            <div className="modal-footer">
-
-                                                <button type="button" className="btn btn-primary form-control" onClick={async function() {
-
-                                                    await setForgotPass(false);
-                                                    setInputValues(inputValuesInitial);
-                                                    setResetFailed(false); setInputErrors(inputErrorsInitial);
-                                                    setErrorBorders(errorBordersInitial);
-                                                    if (document.cookie.includes('email=')) {
-                            
-                                                        let cookiesEmail = document.cookie.split(';');
-                                                        const cookiesEmailIndex = cookiesEmail.findIndex(el => el.includes('email='));
-
-                                                        cookiesEmail = cookiesEmail[cookiesEmailIndex].split('=')[1];
-                                                        setInputValues({...inputValues, email: cookiesEmail});
-                                                        focusRef.current.classList.add(input_autofilled);
-                                                        focusRef.current.addEventListener('input', () => focusRef.current.classList.remove(input_autofilled));
-                                                        rememberCheckBoxRef.current.checked = true;
-                                                        setTimeout(() => signPasswordRef.current.focus(), 0);
-
-                                                    } else {
-
-                                                        setTimeout(() => focusRef.current.focus(), 0);
-
-                                                    }} }>Back to sign in</button>
 
                                             </div>
 
@@ -678,20 +674,20 @@ export default function Header() {
 
                                                             <div className={`${w_30} text-center`}>
 
-                                                                <select className={`custom-select col mb-2 text-center ${errorBorders.month && 'is-invalid'}`} size="2" name="month" value={inputValues.month} onChange={inputControl}>
+                                                                <select className={`custom-select col mb-2 text-center ${sign_select} ${errorBorders.month && 'is-invalid'}`} size="2" name="month" value={inputValues.month} onChange={inputControl}>
 
-                                                                    <option value="1">Jan</option>
-                                                                    <option value="2">Feb</option>
-                                                                    <option value="3">March</option>
-                                                                    <option value="4">April</option>
-                                                                    <option value="5">May</option>
-                                                                    <option value="6">June</option>
-                                                                    <option value="7">July</option>
-                                                                    <option value="8">Aug</option>
-                                                                    <option value="9">Sept</option>
-                                                                    <option value="10">Oct</option>
-                                                                    <option value="11">Nov</option>
-                                                                    <option value="12">Dec</option>
+                                                                    <option value="January">Jan</option>
+                                                                    <option value="February">Feb</option>
+                                                                    <option value="March">March</option>
+                                                                    <option value="April">April</option>
+                                                                    <option value="May">May</option>
+                                                                    <option value="June">June</option>
+                                                                    <option value="July">July</option>
+                                                                    <option value="August">Aug</option>
+                                                                    <option value="Septeber">Sept</option>
+                                                                    <option value="October">Oct</option>
+                                                                    <option value="November">Nov</option>
+                                                                    <option value="December">Dec</option>
 
                                                                 </select>
 
@@ -699,7 +695,7 @@ export default function Header() {
 
                                                             <div className={`${w_30}`}>
 
-                                                                <select className={`custom-select col mb-2 text-center ${errorBorders.day && 'is-invalid'}`} size="2" name="day" value={inputValues.day} onChange={inputControl}>
+                                                                <select className={`custom-select col mb-2 text-center ${sign_select} ${errorBorders.day && 'is-invalid'}`} size="2" name="day" value={inputValues.day} onChange={inputControl}>
 
                                                                     <option value="1">1</option>
                                                                     <option value="2">2</option>
@@ -739,7 +735,7 @@ export default function Header() {
 
                                                             <div className={`${w_30}`}>
 
-                                                                <select className={`custom-select col mb-2 text-center ${errorBorders.year && 'is-invalid'}`} name="year" size="2" value={inputValues.year} onChange={inputControl}>
+                                                                <select className={`custom-select col mb-2 text-center ${sign_select} ${errorBorders.year && 'is-invalid'}`} name="year" size="2" value={inputValues.year} onChange={inputControl}>
 
                                                                     <SelectYear/>
 
