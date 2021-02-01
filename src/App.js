@@ -28,18 +28,22 @@ function App() {
   return (
 
       <div>
+
+        <React.StrictMode>
         
-        <Router>
+          <Router>
 
-          <Header/>
+            <Header/>
 
-          <Route exact path="/" component={isSignedIn ? () => <h1>Abc</h1> : Welcome }/>
+            <Route exact path="/" component={isSignedIn ? () => <h1>Abc</h1> : Welcome }/>
 
-          <Route exact path="/settings" component={Settings}/>
+            <Route exact path="/settings" component={Settings}/>
 
-          <Route exact path={`/${displayName}_${uid}`} component={Profile}/>
+            <Route exact path={`/${displayName}_${uid}`} component={Profile}/>
 
-        </Router>
+          </Router>
+
+        </React.StrictMode>
 
       </div>
 

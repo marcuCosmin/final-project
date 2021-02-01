@@ -4,7 +4,7 @@ export default function SelectYear() {
 
     const years = [];
 
-    const minimumYear = new Date().getFullYear() - 105;
+    const minimumYear = new Date().getFullYear() - 120;
 
     for (let year = new Date().getFullYear(); year - minimumYear !== -1; year--) {
 

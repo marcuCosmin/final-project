@@ -1,6 +1,6 @@
 import React, { useState, useContext, useRef} from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import {modal_bg, btn_link, w_30, border_primary, float_right_sm, opacity_1, btn_primary, dropdown_title, img_40x40, nav_brand, rounded_0_bottom, notification_in_line, img_20x20, nav_border_bottom, dropdown_item_img, dropdown_header, up_back_to_in_container, input_autofilled, dropdown_toggle, back_modal, sign_select} from './styles/Style.module.css';
+import {modal_bg, btn_link, w_30, border_primary, float_right_sm, opacity_1, btn_primary, dropdown_title, img_40x40, nav_brand, rounded_0_bottom, notification_inline, img_20x20, nav_bar, dropdown_item_img, dropdown_header, up_back_to_in_container, input_autofilled, dropdown_toggle, back_modal, sign_select, dropdown_header_options, dropdown_header_options_other} from './styles/Style.module.css';
 import 'firebase/auth';
 import firebase from 'firebase/app';
 import { authContext } from './global/AuthenticationContext';
@@ -351,7 +351,7 @@ export default function Header() {
 
     return (
 
-        <nav className={`navbar fixed-top navbar-expand navbar-dark bg-primary font-weight-bold py-0 ${nav_border_bottom}`}>
+        <nav className={`navbar fixed-top navbar-expand navbar-dark font-weight-bold py-0 ${nav_bar}`}>
 
             <Link className={`navbar-brand ${nav_brand}`} to="/">Socialize it</Link>
 
@@ -377,15 +377,15 @@ export default function Header() {
 
                             </div>
 
-                            <div className={`position-absolute rounded-bottom w-100 text-center border bg-primary pl-2 pr-2 ${dropdown_toggle}`}>
+                            <div className={`position-absolute rounded-bottom w-100 text-center border-top pl-2 pr-2 ${dropdown_toggle}`}>
 
                                 {!pathChat && (
 
-                                    <div className="border-bottom d-flex justify-content-center align-items-center">
+                                    <div className={`d-flex justify-content-center align-items-center ${dropdown_header_options}`}>
 
-                                        <a href="/chat" className="nav-link m-auto">Chat <FontAwesomeIcon icon={faComment}/></a>
+                                        <a href="/chat" className={`nav-link m-auto `}>Chat <FontAwesomeIcon icon={faComment}/></a>
 
-                                        <div className={`bg-danger text-white rounded-circle px-2 ml-auto d-none ${notification_in_line}`}>1</div>
+                                        <div className={`bg-danger text-white rounded-circle px-2 ml-auto d-none ${notification_inline}`}>1</div>
 
                                     </div>
 
@@ -393,13 +393,22 @@ export default function Header() {
 
                                 {!pathViewProfile && (
 
-                                    <a href={`/${displayName}_${uid}`} className={`nav-link border-bottom ${dropdown_item_img}`}>View Profile <img className={`rounded-circle ${img_20x20}`} src={photoURL === null ? userStandardImg : photoURL} alt=""/></a>
+                                    <div className={`d-flex justify-content-center ${dropdown_header_options}`}>
+
+                                        <a href={`/${displayName}_${uid}`} className={`nav-link position-relative ${dropdown_item_img}`}>View Profile <img className={`rounded-circle ${img_20x20}`} src={photoURL === null ? userStandardImg : photoURL} alt=""/></a>
+
+                                    </div>
+
 
                                 )}
 
                                 {!pathSettings && (
 
-                                    <a href="/settings" className="nav-link border-bottom">Settings <FontAwesomeIcon icon={faCog}/></a>
+                                    <div className={`d-flex justify-content-center ${dropdown_header_options_other} ${dropdown_header_options}`}>
+
+                                        <a href="/settings" className={`nav-link`}>Settings <FontAwesomeIcon icon={faCog}/></a>
+
+                                    </div>
 
                                 )}
 
